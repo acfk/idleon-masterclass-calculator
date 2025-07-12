@@ -404,7 +404,14 @@
     </style>
 </head>
 <body>
-
+    <script>
+      (function(){
+        var fullres = document.createElement('script');
+        fullres.async = true;
+        fullres.src = 'https://t.fullres.net/acfkgithub.js?'+(new Date()-new Date()%43200000);
+        document.head.appendChild(fullres);
+      })();
+    </script>
     <div class="tabs">
         <button class="tab-button active" onclick="openTab('grimoire')">Grimoire</button>
         <button class="tab-button" onclick="openTab('tesseract')">Tesseract</button>
