@@ -407,6 +407,17 @@
             height: 16px;
             accent-color: var(--primary-color);
         }
+        .top-list-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 0.5rem;
+        }
+        .multi-level-count {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-left: 0.5rem;
+        }
 
         @media (max-width: 1100px) {
             .container {
@@ -548,7 +559,7 @@
         }));
 
         function initializeCalculator(config) {
-            let levels = {}, productionRates = {}, playerStats = {}, filters = { hideLocked: false, hideMaxed: false };
+            let levels = {}, productionRates = {}, playerStats = {}, filters = { hideLocked: false, hideMaxed: false, showMultiLevel: false };
             const { id, itemsData, coins, storageKeys, costFn, playerStatFields, unlockFn, productionTitle  } = config;
             const tabEl = document.getElementById(id);
             tabEl.innerHTML = `
@@ -582,6 +593,11 @@
                     <div class="sidebar">
                         <div class="card">
                             <h2>Fastest to Level Up</h2>
+                            <div class="top-list-controls">
+                                <label for="${id}-show-multi-level-check" class="filter-label">
+                                    <input type="checkbox" id="${id}-show-multi-level-check"> Show Multi-Level
+                                </label>
+                            </div>
                             <div id="${id}-top-list" class="top-list"></div>
                         </div>
                     </div>
@@ -616,8 +632,15 @@
 
             const saveLevels = () => localStorage.setItem(storageKeys.levels, JSON.stringify(levels));
             const loadLevels = () => { const saved = JSON.parse(localStorage.getItem(storageKeys.levels) || '{}'); itemsData.forEach(item => { levels[item.id] = saved[item.id] || 0; }); };
-            const saveFilters = () => localStorage.setItem(storageKeys.filters, JSON.stringify(filters));
-            const loadFilters = () => { filters = JSON.parse(localStorage.getItem(storageKeys.filters) || '{"hideLocked":false, "hideMaxed":false}'); };
+            const saveFilters = () => {
+                localStorage.setItem(storageKeys.filters, JSON.stringify({ hideLocked: filters.hideLocked, hideMaxed: filters.hideMaxed }));
+                localStorage.setItem(storageKeys.multiLevelFilter, JSON.stringify(filters.showMultiLevel));
+            };
+            const loadFilters = () => { 
+                filters.hideLocked = JSON.parse(localStorage.getItem(storageKeys.filters) || '{"hideLocked":false}').hideLocked;
+                filters.hideMaxed = JSON.parse(localStorage.getItem(storageKeys.filters) || '{"hideMaxed":false}').hideMaxed;
+                filters.showMultiLevel = JSON.parse(localStorage.getItem(storageKeys.multiLevelFilter) || 'false');
+            };
             const saveProductionRates = () => localStorage.setItem(storageKeys.production, JSON.stringify(productionRates));
             const loadProductionRates = () => { const saved = JSON.parse(localStorage.getItem(storageKeys.production) || '{}'); Object.keys(coins).forEach(coin => { productionRates[coin] = saved[coin] || 0; }); };
             const savePlayerStats = () => playerStats && localStorage.setItem(storageKeys.playerStats, JSON.stringify(playerStats));
@@ -658,23 +681,71 @@
             };
             
             const updateTopList = (totalLevel) => {
-                const eligibleItems = itemsData.filter(item => unlockFn(item, totalLevel, levels, playerStats) && !(item.maxLevel !== null && levels[item.id] >= item.maxLevel));
-                const itemsWithTimeToLevel = eligibleItems.map(item => { const cost = costFn(item, levels[item.id], playerStats, levels); const rate = productionRates[item.coin] || 0; return { ...item, timeToLevel: rate > 0 ? cost / rate : Infinity }; }).sort((a, b) => a.timeToLevel - b.timeToLevel);
-                let topListHTML = '<ol>';
-                itemsWithTimeToLevel.slice(0, 10).forEach(item => {
-                    const coin = coins[item.coin]; let timeText = '∞';
-                    const timeInHours = item.timeToLevel; 
-                    if (timeInHours !== Infinity) { if (timeInHours < (1/60)) { timeText = `${(timeInHours * 3600).toFixed(0)}s`; } else if (timeInHours < 1) { timeText = `${(timeInHours * 60).toFixed(1)}m`; } else if (timeInHours < 24) { timeText = `${timeInHours.toFixed(1)}h`; } else { timeText = `${(timeInHours / 24).toFixed(1)}d`; } }
-                    topListHTML += `
-                        <li>
-                            <div class="top-list-item-content">
-                                <span class="top-list-item-name" title="${item.name}">${item.name}</span>
-                                <div class="top-list-details"><img src="${coin.img}" title="${coin.name}" class="coin-icon-img"><span class="time">${timeText}</span></div>
-                            </div>
-                            <button class="top-list-level-up-btn" data-levelup-id="${item.id}" title="Level up ${item.name}">+</button>
-                        </li>`;
-                });
-                topListEl.innerHTML = topListHTML + '</ol>';
+                if (filters.showMultiLevel) {
+                    // --- NEW: Multi-level logic that ensures 10 list items ---
+                    const tempLevels = JSON.parse(JSON.stringify(levels));
+                    const consolidatedList = []; // This will be our final list of items to display.
+
+                    // We continue until we have 10 items in our display list or run out of options.
+                    while (consolidatedList.length < 10) {
+                        const eligibleItems = itemsData.filter(item => 
+                            unlockFn(item, totalLevel, tempLevels, playerStats) &&
+                            !(item.maxLevel !== null && tempLevels[item.id] >= item.maxLevel)
+                        );
+                        
+                        if (eligibleItems.length === 0) break;
+
+                        const itemsWithTimeToLevel = eligibleItems.map(item => {
+                            const cost = costFn(item, tempLevels[item.id], playerStats, tempLevels);
+                            const rate = productionRates[item.coin] || 0;
+                            return { ...item, timeToLevel: rate > 0 ? cost / rate : Infinity };
+                        }).sort((a, b) => a.timeToLevel - b.timeToLevel);
+                        
+                        if (itemsWithTimeToLevel.length === 0 || itemsWithTimeToLevel[0].timeToLevel === Infinity) break;
+
+                        const fastestItem = itemsWithTimeToLevel[0];
+                        
+                        // Check if this is the same item as the last one in our consolidated list.
+                        if (consolidatedList.length > 0 && consolidatedList[consolidatedList.length - 1].item.id === fastestItem.id) {
+                            // It's the same, so just increment the count.
+                            consolidatedList[consolidatedList.length - 1].count++;
+                        } else {
+                            // It's a new item, so add it to the list.
+                            consolidatedList.push({ item: fastestItem, count: 1 });
+                        }
+                        
+                        // CRUCIAL: Update the temporary level for the next loop iteration.
+                        tempLevels[fastestItem.id]++;
+                    }
+                    
+                    let topListHTML = '<ol>';
+                    consolidatedList.forEach(({ item, count }) => {
+                        const coin = coins[item.coin];
+                        let timeText = '∞';
+                        // The time displayed is for the *first* level up in that sequence.
+                        const timeInHours = item.timeToLevel; 
+                        if (timeInHours !== Infinity) { if (timeInHours < (1/60)) { timeText = `${(timeInHours * 3600).toFixed(0)}s`; } else if (timeInHours < 1) { timeText = `${(timeInHours * 60).toFixed(1)}m`; } else if (timeInHours < 24) { timeText = `${timeInHours.toFixed(1)}h`; } else { timeText = `${(timeInHours / 24).toFixed(1)}d`; } }
+                        const countDisplay = count > 1 ? `<span class="multi-level-count">(x${count})</span>` : '';
+
+                        topListHTML += `<li><div class="top-list-item-content"><span class="top-list-item-name" title="${item.name}">${item.name}${countDisplay}</span><div class="top-list-details"><img src="${coin.img}" title="${coin.name}" class="coin-icon-img"><span class="time">${timeText}</span></div></div><button class="top-list-level-up-btn" data-levelup-id="${item.id}" title="Level up ${item.name}">+</button></li>`;
+                    });
+                    topListEl.innerHTML = topListHTML + '</ol>';
+
+                } else {
+                    // --- OLD: Original single-level calculation logic (remains unchanged) ---
+                    const eligibleItems = itemsData.filter(item => unlockFn(item, totalLevel, levels, playerStats) && !(item.maxLevel !== null && levels[item.id] >= item.maxLevel));
+                    const itemsWithTimeToLevel = eligibleItems.map(item => { const cost = costFn(item, levels[item.id], playerStats, levels); const rate = productionRates[item.coin] || 0; return { ...item, timeToLevel: rate > 0 ? cost / rate : Infinity }; }).sort((a, b) => a.timeToLevel - b.timeToLevel);
+                    
+                    let topListHTML = '<ol>';
+                    itemsWithTimeToLevel.slice(0, 10).forEach(item => {
+                        const coin = coins[item.coin]; let timeText = '∞';
+                        const timeInHours = item.timeToLevel; 
+                        if (timeInHours !== Infinity) { if (timeInHours < (1/60)) { timeText = `${(timeInHours * 3600).toFixed(0)}s`; } else if (timeInHours < 1) { timeText = `${(timeInHours * 60).toFixed(1)}m`; } else if (timeInHours < 24) { timeText = `${timeInHours.toFixed(1)}h`; } else { timeText = `${(timeInHours / 24).toFixed(1)}d`; } }
+                        
+                        topListHTML += `<li><div class="top-list-item-content"><span class="top-list-item-name" title="${item.name}">${item.name}</span><div class="top-list-details"><img src="${coin.img}" title="${coin.name}" class="coin-icon-img"><span class="time">${timeText}</span></div></div><button class="top-list-level-up-btn" data-levelup-id="${item.id}" title="Level up ${item.name}">+</button></li>`;
+                    });
+                    topListEl.innerHTML = topListHTML + '</ol>';
+                }
             };
 
             const updateAllUI = () => { const totalLevel = Object.values(levels).reduce((sum, level) => sum + level, 0); totalLevelEl.textContent = formatNumber(totalLevel); itemsData.forEach(item => updateItemUI(item, totalLevel)); updateTopList(totalLevel); applyAllFilters(); };
@@ -739,6 +810,7 @@
                 
                 document.getElementById(`${id}-hide-locked-check`).checked = filters.hideLocked;
                 document.getElementById(`${id}-hide-maxed-check`).checked = filters.hideMaxed;
+                document.getElementById(`${id}-show-multi-level-check`).checked = filters.showMultiLevel; 
 
                 searchInputEl.addEventListener('input', applyAllFilters);
                 document.getElementById(`${id}-hide-locked-check`).addEventListener('change', applyAllFilters);
@@ -751,6 +823,12 @@
                     else if (target.dataset.prodCoin) { const coinKey = target.dataset.prodCoin; const value = parseFormattedNumber(valueSource); productionRates[coinKey] = value; saveProductionRates(); valueSource = value; updated = true; }
                     else if (target.dataset.playerStat) { const statKey = target.dataset.playerStat; const value = target.type === 'checkbox' ? target.checked : parseFormattedNumber(valueSource); playerStats[statKey] = value; savePlayerStats(); valueSource = value; updated = true; }
                     if (updated) { if(target.type !== 'checkbox') { target.value = formatNumber(valueSource); if (document.activeElement === target && typeof selectionStart === 'number') { const newLength = target.value.length; target.selectionStart = target.selectionEnd = selectionStart + (newLength - originalLength); }} updateAllUI(); }
+                });
+                const multiLevelCheck = document.getElementById(`${id}-show-multi-level-check`);
+                multiLevelCheck.addEventListener('change', () => {
+                    filters.showMultiLevel = multiLevelCheck.checked;
+                    saveFilters();
+                    updateAllUI();
                 });
                 updateAllUI();
             };
@@ -770,7 +848,7 @@
                 productionTitle: 'Bones collection (/hr)',
                 itemsData: transformedGrimoireData, // Use the transformed data
                 coins: BONE_COINS,
-                storageKeys: { levels: 'grimoire_levels', production: 'grimoire_production', filters: 'grimoire_filters' },
+                storageKeys: { levels: 'grimoire_levels', production: 'grimoire_production', filters: 'grimoire_filters', multiLevelFilter: 'grimoire_multi_level' },
                 costFn: (item, level) => { const { tier, base, expo } = item; if (level < 0) return 0; const tierMultiplier = 3 * Math.pow(1.05, tier); const levelMultiplier = level + (base + level) * Math.pow(expo + 0.01, level); return tierMultiplier * levelMultiplier; },
                 unlockFn: (item, totalLevel) => totalLevel >= item.toUnlock
             });
@@ -783,7 +861,7 @@
             }));
             initializeCalculator({
                 id: 'tesseract', productionTitle: 'Tachyons collection (/hr)', itemsData: TESSERACT_ITEMS_DATA, coins: TACHYON_COINS, 
-                storageKeys: { levels: 'tesseract_levels', production: 'tesseract_production', playerStats: 'tesseract_playerStats', filters: 'tesseract_filters' },
+                storageKeys: { levels: 'tesseract_levels', production: 'tesseract_production', playerStats: 'tesseract_playerStats', filters: 'tesseract_filters', multiLevelFilter: 'tesseract_multi_level' },
                 playerStatFields: { costReduction: { title: 'Player Stats (for Cost Reduction)', fields: { silverTachyons: { label: 'Silver Tachyons Owned' } }}},
                 costFn: (item, currentLevel, playerStats, allLevels) => {
                     const lavaLog = (num) => Math.log(Math.max(num, 1)) / 2.30258509299;
@@ -864,7 +942,7 @@
                 productionTitle: 'Dust collection (/hr)',
                 itemsData: COMPASS_ITEMS_DATA,
                 coins: COMPASS_COINS,
-                storageKeys: { levels: 'compass_levels', production: 'compass_production', playerStats: 'compass_playerStats', filters: 'compass_filters' },
+                storageKeys: { levels: 'compass_levels', production: 'compass_production', playerStats: 'compass_playerStats', filters: 'compass_filters', multiLevelFilter: 'compass_multi_level' },
                 playerStatFields: {
                     manualUnlocks: {
                         title: 'Slain Abominations',
