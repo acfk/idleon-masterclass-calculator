@@ -367,9 +367,26 @@
             border-radius: var(--border-radius);
             border: 1px solid var(--border-color);
         }
+        .total-level-display {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-top: 4px solid var(--primary-color); 
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; 
+        }
         .total-level-display h2 {
             color: var(--text-color); 
-            margin: 0;
+            margin: 0; 
+        }
+        .total-level-display p {
+            margin: 0; 
+            text-align: right;
         }
         .unlock-text { font-size: 0.8em; opacity: 0.8; }
         hr { border: 0; height: 1px; background-color: var(--border-color); margin: 2rem 0;}
@@ -544,6 +561,11 @@
         const parseFormattedNumber = (str) => parseInt(String(str).replace(/,/g, ''), 10) || 0;
         function openTab(tabName) { document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active')); document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active')); document.getElementById(tabName).classList.add('active'); document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`).classList.add('active'); }
 
+        const formatTimeInHours = (timeInHours) => {
+            if (timeInHours === Infinity || isNaN(timeInHours)) return '∞';
+            return `${timeInHours.toFixed(2)} hours`;
+        };
+
         const calculators = {};
 
         const BONE_COIN_MAP = ["femur", "ribcage", "cranium", "bovinae"];
@@ -586,6 +608,7 @@
                         <div id="${id}-item-list-container">
                             <div class="total-level-display">
                                 <h2>Total Levels: <span id="${id}-total-level">0</span></h2>
+                                <p id="${id}-next-unlock-time" class="unlock-text" style="margin-top: 0.5rem;"></p>
                             </div>
                             <div id="${id}-item-list" class="item-list"></div>
                         </div>
@@ -748,7 +771,45 @@
                 }
             };
 
-            const updateAllUI = () => { const totalLevel = Object.values(levels).reduce((sum, level) => sum + level, 0); totalLevelEl.textContent = formatNumber(totalLevel); itemsData.forEach(item => updateItemUI(item, totalLevel)); updateTopList(totalLevel); applyAllFilters(); };
+            const updateNextUnlockTime = (totalLevel) => {
+                const nextUnlockTimeEl = document.getElementById(`${id}-next-unlock-time`);
+                if (!nextUnlockTimeEl) return;
+                const nextUnlockItem = itemsData.find(item => item.toUnlock > totalLevel);
+
+                if (!nextUnlockItem) {
+                    nextUnlockTimeEl.textContent = 'All items unlocked!';
+                    return;
+                }
+
+                const levelsNeeded = nextUnlockItem.toUnlock - totalLevel;
+                const eligibleItems = itemsData.filter(item =>
+                    unlockFn(item, totalLevel, levels, playerStats) &&
+                    !(item.maxLevel !== null && levels[item.id] >= item.maxLevel)
+                );
+
+                const timeForFastestLevelUp = Math.min(
+                    ...eligibleItems.map(item => {
+                        const cost = costFn(item, levels[item.id], playerStats, levels);
+                        const rate = productionRates[item.coin] || 0;
+                        return rate > 0 ? cost / rate : Infinity;
+                    })
+                );
+
+                if (timeForFastestLevelUp === Infinity) {
+                    nextUnlockTimeEl.innerHTML = `Next unlock in <strong>${levelsNeeded}</strong> levels.<br>(Cannot calculate time without production rates).`;
+                    return;
+                }
+                const totalTimeInHours = levelsNeeded * timeForFastestLevelUp;
+                const titleAttribute = `title="Next unlock is '${nextUnlockItem.name}'"`;
+                nextUnlockTimeEl.innerHTML = `<span ${titleAttribute}>Next Unlock: <strong>~${formatTimeInHours(totalTimeInHours)}</strong></span>`;
+            };
+
+            const updateAllUI = () => { const totalLevel = Object.values(levels).reduce((sum, level) => sum + level, 0); totalLevelEl.textContent = formatNumber(totalLevel); itemsData.forEach(item => updateItemUI(item, totalLevel)); updateTopList(totalLevel); 
+                if (id === 'grimoire' || id === 'tesseract') {
+                    updateNextUnlockTime(totalLevel);
+                }
+                applyAllFilters(); 
+            };
 
             const applyAllFilters = () => {
                 const searchTerm = searchInputEl.value.toLowerCase().trim();
