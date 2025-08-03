@@ -775,31 +775,49 @@
                 const nextUnlockTimeEl = document.getElementById(`${id}-next-unlock-time`);
                 if (!nextUnlockTimeEl) return;
                 const nextUnlockItem = itemsData.find(item => item.toUnlock > totalLevel);
-
                 if (!nextUnlockItem) {
                     nextUnlockTimeEl.textContent = 'All items unlocked!';
                     return;
                 }
-
                 const levelsNeeded = nextUnlockItem.toUnlock - totalLevel;
-                const eligibleItems = itemsData.filter(item =>
-                    unlockFn(item, totalLevel, levels, playerStats) &&
-                    !(item.maxLevel !== null && levels[item.id] >= item.maxLevel)
-                );
-
-                const timeForFastestLevelUp = Math.min(
-                    ...eligibleItems.map(item => {
-                        const cost = costFn(item, levels[item.id], playerStats, levels);
+                const simulatedLevels = JSON.parse(JSON.stringify(levels));
+                let simulatedTotalLevel = totalLevel;
+                let totalTimeInHours = 0;
+                
+                while (simulatedTotalLevel < nextUnlockItem.toUnlock) {
+                    const eligibleItems = itemsData.filter(item =>
+                        unlockFn(item, simulatedTotalLevel, simulatedLevels, playerStats) &&
+                        !(item.maxLevel !== null && simulatedLevels[item.id] >= item.maxLevel)
+                    );
+                    
+                    if (eligibleItems.length === 0) {
+                        nextUnlockTimeEl.innerHTML = `Next unlock in <strong>${levelsNeeded}</strong> levels.<br>(Cannot calculate time without eligible items to level up).`;
+                        return;
+                    }
+                    
+                    const itemWithMinTime = eligibleItems.reduce((minItem, item) => {
+                        const itemLevel = simulatedLevels[item.id] || 0;
+                        const cost = costFn(item, itemLevel, playerStats, simulatedLevels);
                         const rate = productionRates[item.coin] || 0;
-                        return rate > 0 ? cost / rate : Infinity;
-                    })
-                );
-
-                if (timeForFastestLevelUp === Infinity) {
-                    nextUnlockTimeEl.innerHTML = `Next unlock in <strong>${levelsNeeded}</strong> levels.<br>(Cannot calculate time without production rates).`;
-                    return;
+                        const timeToLevelUp = rate > 0 ? cost / rate : Infinity;
+                        
+                        if (timeToLevelUp < minItem.timeToLevelUp) {
+                            return { item, timeToLevelUp };
+                        }
+                        return minItem;
+                    }, { item: null, timeToLevelUp: Infinity });
+                    
+                    if (itemWithMinTime.timeToLevelUp === Infinity) {
+                        nextUnlockTimeEl.innerHTML = `Next unlock in <strong>${levelsNeeded}</strong> levels.<br>(Cannot calculate time without production rates).`;
+                        return;
+                    }
+                    
+                    totalTimeInHours += itemWithMinTime.timeToLevelUp;
+                    
+                    simulatedLevels[itemWithMinTime.item.id]++;
+                    simulatedTotalLevel++;
                 }
-                const totalTimeInHours = levelsNeeded * timeForFastestLevelUp;
+                
                 const titleAttribute = `title="Next unlock is '${nextUnlockItem.name}'"`;
                 nextUnlockTimeEl.innerHTML = `<span ${titleAttribute}>Next Unlock: <strong>~${formatTimeInHours(totalTimeInHours)}</strong></span>`;
             };
