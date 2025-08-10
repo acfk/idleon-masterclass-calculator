@@ -20,18 +20,7 @@
             --locked-border-color: #e74c3c;
             --shadow-color: rgba(0, 0, 0, 0.2);
             --dark-text-color: #1f1f22;
-            --femur-color: #D3C5A0;
-            --ribcage-color: #e0e0e0;
-            --cranium-color: #827C6A;
-            --bovinae-color: #cd7f32;
-
-            --purple-color: #9b59b6;
-            --brown-color: #a0522d;
-            --green-color: #2ecc71;
-            --red-color: #e74c3c;
-            --silver-color: #bdc3c7;
-            --gold-color: #f1c40f;
-
+            
             --border-radius: 12px;
             --transition-speed: 0.3s;
         }
@@ -367,15 +356,6 @@
             border-top: 4px solid var(--primary-color); 
             border-radius: var(--border-radius);
             border: 1px solid var(--border-color);
-        }
-        .total-level-display {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            background-color: var(--card-bg);
-            padding: 1rem;
-            border-top: 4px solid var(--primary-color); 
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -464,17 +444,113 @@
             flex-grow: 1; 
             min-width: 200px;
         }
-        .top-list-controls {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 0.5rem;
-        }
         .multi-level-count {
             font-size: 0.9em;
             font-weight: bold;
             color: var(--secondary-color);
             margin-left: 0.5rem;
         }
+
+        .mode-switcher {
+            display: flex;
+            gap: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 4px;
+            background-color: var(--bg-color);
+        }
+        .mode-button {
+            flex: 1;
+            padding: 0.4rem 1rem;
+            border-radius: 16px;
+            border: none;
+            background-color: transparent;
+            color: var(--text-color);
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            text-align: center;
+        }
+        .mode-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .afk-mode-content {
+            display: grid;
+            gap: 1.5rem;
+        }
+        .afk-results-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .afk-results-list li {
+            background-color: #333;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            border-left: 4px solid var(--primary-color-light);
+        }
+        .afk-item-name {
+            font-weight: 600;
+            flex-grow: 1;
+        }
+        .afk-item-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        .afk-level-change {
+            font-size: 0.95em;
+            color: var(--text-color);
+            opacity: 0.9;
+            min-width: 140px;
+            text-align: center;
+        }
+        .afk-level-change strong {
+            color: var(--primary-color-light);
+            font-weight: 600;
+        }
+        .afk-results-summary {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        .afk-results-summary span {
+            color: var(--secondary-color);
+        }
+        #afk-apply-btn, .afk-calculate-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        #afk-apply-btn:hover, .afk-calculate-btn:hover {
+            background-color: var(--primary-color-dark);
+        }
+        .afk-coin-inputs .info-row .coin-label { width: 170px; }
+        .afk-coin-inputs .info-row { font-size: 1.1em; }
+
 
         @media (max-width: 1100px) {
             .container {
@@ -598,42 +674,15 @@
         };
 
         const COMPASS_UPGRADE_CATEGORIES = {
-            damage: {
-                name: 'Damage',
-                upgradeIndices: [8,13,14,15,18,23,24,26,60,64,70,73,74,78,80,81,85,94,119,121,122,123,126,127,129,130,132,135]
-            },
-            dust: {
-                name: 'Dust',
-                upgradeIndices: [31,33,34,36,38,39,68,77,80,86,89,93,139,142,145,148,150]
-            },
-            accuracy: {
-                name: 'Accuracy',
-                upgradeIndices: [17,19,22,25,61,80,84,90,120,124,125,128,131,133,134,136,147]
-            },
-            defence: {
-                name: 'Defence',
-                upgradeIndices: [29,30,37,63,83,88,91,137,138,141,143,144,149]
-            },
-            crit: {
-                name: 'Crit',
-                upgradeIndices: [16,20,66,75]
-            },
-            attackSpeed: {
-                name: 'Attack Speed',
-                upgradeIndices: [21,32,35,62,65,69]
-            },
-            hp: {
-                name: 'HP',
-                upgradeIndices: [27,28,87,92,140,146]
-            },
-            out: {
-                name: 'Not Tempest mode',
-                upgradeIndices: [40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,67,76,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169]
-            },
-            drop: {
-                name: 'Drops',
-                upgradeIndices: [3,4,5,6,7,9,10,11,12,72,82,105,106,107,108,109,110,111,112,113,114,115,116,117,118]
-            }
+            damage: { name: 'Damage', upgradeIndices: [8,13,14,15,18,23,24,26,60,64,70,73,74,78,80,81,85,94,119,121,122,123,126,127,129,130,132,135] },
+            dust: { name: 'Dust', upgradeIndices: [31,33,34,36,38,39,68,77,80,86,89,93,139,142,145,148,150] },
+            accuracy: { name: 'Accuracy', upgradeIndices: [17,19,22,25,61,80,84,90,120,124,125,128,131,133,134,136,147] },
+            defence: { name: 'Defence', upgradeIndices: [29,30,37,63,83,88,91,137,138,141,143,144,149] },
+            crit: { name: 'Crit', upgradeIndices: [16,20,66,75] },
+            attackSpeed: { name: 'Attack Speed', upgradeIndices: [21,32,35,62,65,69] },
+            hp: { name: 'HP', upgradeIndices: [27,28,87,92,140,146] },
+            out: { name: 'Not Tempest mode', upgradeIndices: [40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,67,76,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169] },
+            drop: { name: 'Drops', upgradeIndices: [3,4,5,6,7,9,10,11,12,72,82,105,106,107,108,109,110,111,112,113,114,115,116,117,118] }
         };
 
         const formatNumber = (num) => { if (isNaN(num) || num === null) return '0'; if (num > Number.MAX_SAFE_INTEGER || num.toString().includes('e')) return num.toExponential(2); return Math.floor(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); };
@@ -649,48 +698,67 @@
 
         const BONE_COIN_MAP = ["femur", "ribcage", "cranium", "bovinae"];
         const transformedGrimoireData = GRIMOIRE_ITEMS_DATA.map((raw, index) => ({
-            id: `g-item${index + 1}`,
-            name: raw.name.replace(/_/g, ' ').replace(/製/g, '').replace(/\(Tap for more info\)/, '').replace(/\(#\)/g, '').trim(),
-            coin: BONE_COIN_MAP[raw.boneType],
-            tier: index,
-            base: raw.x1,
-            expo: raw.x2,
-            toUnlock: raw.unlockLevel,
-            maxLevel: raw.x4 === 999999 ? null : raw.x4
+            id: `g-item${index + 1}`, name: raw.name.replace(/_/g, ' ').replace(/製/g, '').replace(/\(Tap for more info\)/, '').replace(/\(#\)/g, '').trim(), coin: BONE_COIN_MAP[raw.boneType],
+            tier: index, base: raw.x1, expo: raw.x2, toUnlock: raw.unlockLevel, maxLevel: raw.x4 === 999999 ? null : raw.x4
         }));
 
         function initializeCalculator(config) {
-            let levels = {}, productionRates = {}, playerStats = {}, filters = { hideLocked: false, hideMaxed: false };
+            let levels = {}, productionRates = {}, playerStats = {}, filters = { hideLocked: false, hideMaxed: false }, afkBudgets = {}, lastAfkResult = [];
+            let currentMode = 'active';
             let categoryFilterFn = (item) => true;
             const { id, itemsData, coins, storageKeys, costFn, playerStatFields, unlockFn, productionTitle  } = config;
             const tabEl = document.getElementById(id);
             tabEl.innerHTML = `
                 <div class="container">
                     <div class="main-content">
-                        <div class="card">
-                            <h2 id="${id}-prod-title"></h2>
-                            <div id="${id}-production" class="production-grid"></div>
-                            <div id="${id}-player-stats-wrapper"></div>
-                        </div>
-                         <div class="card controls-container">
+                        <div class="card controls-container">
                             <div class="controls-wrapper">
-                                <input type="text" id="${id}-search-input" class="search-input-field" placeholder="Search for an item by name...">
-                                <div class="filter-controls">
-                                    <label for="${id}-hide-locked-check" class="filter-label" data-label-text="Hide Locked">
-                                        <input type="checkbox" id="${id}-hide-locked-check">
-                                    </label>
-                                    <label for="${id}-hide-maxed-check" class="filter-label" data-label-text="Hide Maxed">
-                                        <input type="checkbox" id="${id}-hide-maxed-check">
-                                    </label>
+                                <div class="mode-switcher">
+                                    <button class="mode-button active" data-mode="active">Active</button>
+                                    <button class="mode-button" data-mode="afk">AFK</button>
                                 </div>
                             </div>
                         </div>
-                        <div id="${id}-item-list-container">
+
+                        <div class="active-mode-content">
+                            <div class="card">
+                                <h2 id="${id}-prod-title"></h2>
+                                <div id="${id}-production" class="production-grid"></div>
+                                <div id="${id}-player-stats-wrapper"></div>
+                            </div>
                             <div class="total-level-display">
                                 <h2>Total Levels: <span id="${id}-total-level">0</span></h2>
-                                <p id="${id}-next-unlock-time" class="unlock-text" style="margin-top: 0.5rem;"></p>
+                                <p id="${id}-next-unlock-time" class="unlock-text"></p>
+                            </div>
+                            <div class="card search-filter-container" style="margin-bottom: 1.5rem; padding-bottom: 0.5rem;">
+                                <div class="controls-wrapper">
+                                    <input type="text" id="${id}-search-input" class="search-input-field" placeholder="Search for an item by name...">
+                                    <div class="filter-controls" id="${id}-filter-controls">
+                                        <label for="${id}-hide-locked-check" class="filter-label" data-label-text="Hide Locked">
+                                            <input type="checkbox" id="${id}-hide-locked-check">
+                                        </label>
+                                        <label for="${id}-hide-maxed-check" class="filter-label" data-label-text="Hide Maxed">
+                                            <input type="checkbox" id="${id}-hide-maxed-check">
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                             <div id="${id}-item-list" class="item-list"></div>
+                        </div>
+
+                        <div class="afk-mode-content" style="display:none;">
+                            <div class="card">
+                                <h2>AFK Mode: Calculate Upgrades</h2>
+                                <p>Enter your available coins and see how many levels you can buy.</p>
+                                <div id="${id}-afk-inputs" class="production-grid afk-coin-inputs"></div>
+                                <button id="${id}-afk-calculate-btn" class="afk-calculate-btn">Calculate AFK Upgrades</button>
+                            </div>
+                             <div id="${id}-afk-results-card" class="card" style="display:none;">
+                                <h2>Purchase Plan</h2>
+                                <ul id="${id}-afk-results-list" class="afk-results-list"></ul>
+                                <div id="${id}-afk-results-summary" class="afk-results-summary"></div>
+                                <button id="${id}-afk-apply-btn">Apply These Upgrades</button>
+                            </div>
                         </div>
                     </div>
                     <div class="sidebar">
@@ -708,20 +776,42 @@
             const playerStatsWrapperEl = document.getElementById(`${id}-player-stats-wrapper`);
             const searchInputEl = document.getElementById(`${id}-search-input`);
 
+            const afkInputsEl = document.getElementById(`${id}-afk-inputs`);
+            const afkResultsCardEl = document.getElementById(`${id}-afk-results-card`);
+            const afkResultsListEl = document.getElementById(`${id}-afk-results-list`);
+            const afkResultsSummaryEl = document.getElementById(`${id}-afk-results-summary`);
+            const activeModeContentEl = tabEl.querySelector('.active-mode-content');
+            const afkModeContentEl = tabEl.querySelector('.afk-mode-content');
+            const sidebarEl = tabEl.querySelector('.sidebar');
+
+            const setMode = (mode) => {
+                currentMode = mode;
+                tabEl.querySelectorAll('.mode-button').forEach(btn => btn.classList.toggle('active', btn.dataset.mode === mode));
+                if (mode === 'active') {
+                    activeModeContentEl.style.display = '';
+                    sidebarEl.style.display = '';
+                    afkModeContentEl.style.display = 'none';
+                    updateAllUI();
+                } else {
+                    activeModeContentEl.style.display = 'none';
+                    sidebarEl.style.display = 'none';
+                    afkModeContentEl.style.display = 'grid';
+                }
+            };
+
+            tabEl.querySelector('.mode-switcher').addEventListener('click', e => {
+                if(e.target.matches('.mode-button')) setMode(e.target.dataset.mode);
+            });
+            
             topListEl.addEventListener('click', e => {
                 if (e.target.matches('.top-list-level-up-btn')) {
                     e.preventDefault();
                     const itemId = e.target.dataset.levelupId;
                     if (!itemId) return;
-
                     const item = itemsData.find(i => i.id === itemId);
                     if (!item) return;
-
                     let currentLevel = levels[itemId] || 0;
-                    if (item.maxLevel !== null && currentLevel >= item.maxLevel) {
-                        return; 
-                    }
-                    
+                    if (item.maxLevel !== null && currentLevel >= item.maxLevel) return; 
                     levels[itemId] = currentLevel + 1;
                     saveLevels();
                     updateAllUI(); 
@@ -730,9 +820,7 @@
 
             const saveLevels = () => localStorage.setItem(storageKeys.levels, JSON.stringify(levels));
             const loadLevels = () => { const saved = JSON.parse(localStorage.getItem(storageKeys.levels) || '{}'); itemsData.forEach(item => { levels[item.id] = saved[item.id] || 0; }); };
-            const saveFilters = () => {
-                localStorage.setItem(storageKeys.filters, JSON.stringify({ hideLocked: filters.hideLocked, hideMaxed: filters.hideMaxed }));
-            };
+            const saveFilters = () => localStorage.setItem(storageKeys.filters, JSON.stringify({ hideLocked: filters.hideLocked, hideMaxed: filters.hideMaxed }));
             const loadFilters = () => { 
                 filters.hideLocked = JSON.parse(localStorage.getItem(storageKeys.filters) || '{"hideLocked":false}').hideLocked;
                 filters.hideMaxed = JSON.parse(localStorage.getItem(storageKeys.filters) || '{"hideMaxed":false}').hideMaxed;
@@ -741,6 +829,54 @@
             const loadProductionRates = () => { const saved = JSON.parse(localStorage.getItem(storageKeys.production) || '{}'); Object.keys(coins).forEach(coin => { productionRates[coin] = saved[coin] || 0; }); };
             const savePlayerStats = () => playerStats && localStorage.setItem(storageKeys.playerStats, JSON.stringify(playerStats));
             const loadPlayerStats = () => { if (playerStatFields) { const saved = JSON.parse(localStorage.getItem(storageKeys.playerStats) || '{}'); Object.keys(playerStatFields).forEach(field => { const subFields = playerStatFields[field].fields; Object.keys(subFields).forEach(subKey => { playerStats[subKey] = saved[subKey] ?? subFields[subKey].default ?? 0; }); }); } };
+            const loadAfkBudgets = () => { const saved = JSON.parse(localStorage.getItem(storageKeys.afkBudgets) || '{}'); Object.keys(coins).forEach(coin => { afkBudgets[coin] = saved[coin] || 0; }); };
+            const saveAfkBudgets = () => localStorage.setItem(storageKeys.afkBudgets, JSON.stringify(afkBudgets));
+
+            const calculateTotalLevels = (levelObj) => Object.values(levelObj).reduce((sum, level) => sum + level, 0);
+
+            const calculateAfkUpgrades = () => {
+                const tempLevels = JSON.parse(JSON.stringify(levels));
+                const tempBudgets = JSON.parse(JSON.stringify(afkBudgets));
+                let tempTotalLevels = calculateTotalLevels(tempLevels);
+                const purchaseLog = [];
+
+                while (true) {
+                    let cheapestAffordableUpgrade = { item: null, cost: Infinity };
+                    
+                    for (const item of itemsData) {
+                        const isUnlocked = unlockFn(item, tempTotalLevels, tempLevels, playerStats);
+                        const isMaxed = item.maxLevel !== null && tempLevels[item.id] >= item.maxLevel;
+
+                        if (isUnlocked && !isMaxed) {
+                            const cost = costFn(item, tempLevels[item.id], playerStats, tempLevels);
+                            if (cost < cheapestAffordableUpgrade.cost && tempBudgets[item.coin] >= cost) {
+                                cheapestAffordableUpgrade = { item, cost };
+                            }
+                        }
+                    }
+
+                    if (cheapestAffordableUpgrade.item) {
+                        const { item, cost } = cheapestAffordableUpgrade;
+                        tempBudgets[item.coin] -= cost;
+                        tempLevels[item.id]++;
+                        tempTotalLevels++;
+                        purchaseLog.push({ item, cost });
+                    } else {
+                        break;
+                    }
+                }
+                
+                const consolidated = {};
+                purchaseLog.forEach(({ item, cost }) => {
+                    if (!consolidated[item.id]) {
+                        consolidated[item.id] = { item, levelsBought: 0, totalCost: 0 };
+                    }
+                    consolidated[item.id].levelsBought++;
+                    consolidated[item.id].totalCost += cost;
+                });
+                
+                return Object.values(consolidated).sort((a,b) => a.item.tier - b.item.tier);
+            };
             
             const updateItemUI = (item, totalLevel) => {
                 const card = document.getElementById(item.id); if (!card) return;
@@ -768,19 +904,13 @@
                                 case "Survival":  controlItemId = 'c-item28'; break;
                                 case "Nomadic":   controlItemId = 'c-item41'; break;
                             }
-
                             if (controlItemId) {
                                 const currentPathLevel = levels[controlItemId] || 0;
                                 const levelsNeeded = item.pathUnlockLevel - currentPathLevel;
-
-                                if (levelsNeeded > 0) {
-                                    const pluralS = levelsNeeded === 1 ? '' : 's';
-                                    unlockMsg = `(Needs ${levelsNeeded} more level${pluralS} in ${item.pathName} Path)`;
-                                }
+                                if (levelsNeeded > 0) unlockMsg = `(Needs ${levelsNeeded} more level${levelsNeeded === 1 ? '' : 's'} in ${item.pathName} Path)`;
                             }
                         }
                     }
-
                     unlockEl.textContent = unlockMsg; 
                 } else { 
                     costEl.textContent = formatNumber(costFn(item, currentLevel, playerStats, levels)); 
@@ -795,36 +925,23 @@
             const updateTopList = (totalLevel) => {
                 const tempLevels = JSON.parse(JSON.stringify(levels));
                 const consolidatedList = [];
-
                 while (consolidatedList.length < 10) {
-                    const eligibleItems = itemsData
-                        .filter(item => 
-                            unlockFn(item, totalLevel, tempLevels, playerStats) &&
-                            !(item.maxLevel !== null && tempLevels[item.id] >= item.maxLevel)
-                        )
-                        .filter(categoryFilterFn);
-                    
+                    const eligibleItems = itemsData.filter(item => unlockFn(item, totalLevel, tempLevels, playerStats) && !(item.maxLevel !== null && tempLevels[item.id] >= item.maxLevel)).filter(categoryFilterFn);
                     if (eligibleItems.length === 0) break;
-
                     const itemsWithTimeToLevel = eligibleItems.map(item => {
                         const cost = costFn(item, tempLevels[item.id], playerStats, tempLevels);
                         const rate = productionRates[item.coin] || 0;
                         return { ...item, timeToLevel: rate > 0 ? cost / rate : Infinity };
                     }).sort((a, b) => a.timeToLevel - b.timeToLevel);
-                    
                     if (itemsWithTimeToLevel.length === 0 || itemsWithTimeToLevel[0].timeToLevel === Infinity) break;
-
                     const fastestItem = itemsWithTimeToLevel[0];
-                    
                     if (consolidatedList.length > 0 && consolidatedList[consolidatedList.length - 1].item.id === fastestItem.id) {
                         consolidatedList[consolidatedList.length - 1].count++;
                     } else {
                         consolidatedList.push({ item: fastestItem, count: 1 });
                     }
-                    
                     tempLevels[fastestItem.id]++;
                 }
-                
                 let topListHTML = '<ol>';
                 consolidatedList.forEach(({ item, count }) => {
                     const coin = coins[item.coin];
@@ -832,7 +949,6 @@
                     const timeInHours = item.timeToLevel; 
                     if (timeInHours !== Infinity) { if (timeInHours < (1/60)) { timeText = `${(timeInHours * 3600).toFixed(0)}s`; } else if (timeInHours < 1) { timeText = `${(timeInHours * 60).toFixed(1)}m`; } else if (timeInHours < 24) { timeText = `${timeInHours.toFixed(1)}h`; } else { timeText = `${(timeInHours / 24).toFixed(1)}d`; } }
                     const countDisplay = count > 1 ? `<span class="multi-level-count">(x${count})</span>` : '';
-
                     topListHTML += `<li><div class="top-list-item-content"><span class="top-list-item-name" title="${item.name}">${item.name}${countDisplay}</span><div class="top-list-details"><img src="${coin.img}" title="${coin.name}" class="coin-icon-img"><span class="time">${timeText}</span></div></div><button class="top-list-level-up-btn" data-levelup-id="${item.id}" title="Level up ${item.name}">+</button></li>`;
                 });
                 topListEl.innerHTML = topListHTML + '</ol>';
@@ -842,57 +958,31 @@
                 const nextUnlockTimeEl = document.getElementById(`${id}-next-unlock-time`);
                 if (!nextUnlockTimeEl) return;
                 const nextUnlockItem = itemsData.find(item => item.toUnlock > totalLevel);
-                if (!nextUnlockItem) {
-                    nextUnlockTimeEl.textContent = 'All items unlocked!';
-                    return;
-                }
+                if (!nextUnlockItem) { nextUnlockTimeEl.textContent = 'All items unlocked!'; return; }
                 const levelsNeeded = nextUnlockItem.toUnlock - totalLevel;
                 const simulatedLevels = JSON.parse(JSON.stringify(levels));
                 let simulatedTotalLevel = totalLevel;
                 let totalTimeInHours = 0;
-                
                 while (simulatedTotalLevel < nextUnlockItem.toUnlock) {
-                    const eligibleItems = itemsData.filter(item =>
-                        unlockFn(item, simulatedTotalLevel, simulatedLevels, playerStats) &&
-                        !(item.maxLevel !== null && simulatedLevels[item.id] >= item.maxLevel)
-                    );
-                    
-                    if (eligibleItems.length === 0) {
-                        nextUnlockTimeEl.innerHTML = `Next unlock in <strong>${levelsNeeded}</strong> levels.<br>(Cannot calculate time without eligible items to level up).`;
-                        return;
-                    }
-                    
+                    const eligibleItems = itemsData.filter(item => unlockFn(item, simulatedTotalLevel, simulatedLevels, playerStats) && !(item.maxLevel !== null && simulatedLevels[item.id] >= item.maxLevel));
+                    if (eligibleItems.length === 0) { nextUnlockTimeEl.innerHTML = `Next unlock in <strong>${levelsNeeded}</strong> levels.<br>(Cannot calculate time without eligible items to level up).`; return; }
                     const itemWithMinTime = eligibleItems.reduce((minItem, item) => {
                         const itemLevel = simulatedLevels[item.id] || 0;
                         const cost = costFn(item, itemLevel, playerStats, simulatedLevels);
                         const rate = productionRates[item.coin] || 0;
                         const timeToLevelUp = rate > 0 ? cost / rate : Infinity;
-                        
-                        if (timeToLevelUp < minItem.timeToLevelUp) {
-                            return { item, timeToLevelUp };
-                        }
-                        return minItem;
+                        return timeToLevelUp < minItem.timeToLevelUp ? { item, timeToLevelUp } : minItem;
                     }, { item: null, timeToLevelUp: Infinity });
-                    
-                    if (itemWithMinTime.timeToLevelUp === Infinity) {
-                        nextUnlockTimeEl.innerHTML = `Next unlock in <strong>${levelsNeeded}</strong> levels.<br>(Cannot calculate time without production rates).`;
-                        return;
-                    }
-                    
+                    if (itemWithMinTime.timeToLevelUp === Infinity) { nextUnlockTimeEl.innerHTML = `Next unlock in <strong>${levelsNeeded}</strong> levels.<br>(Cannot calculate time without production rates).`; return; }
                     totalTimeInHours += itemWithMinTime.timeToLevelUp;
-                    
                     simulatedLevels[itemWithMinTime.item.id]++;
                     simulatedTotalLevel++;
                 }
-                
-                const titleAttribute = `title="Next unlock is '${nextUnlockItem.name}'"`;
-                nextUnlockTimeEl.innerHTML = `<span ${titleAttribute}>Next Unlock: <strong>~${formatTimeInHours(totalTimeInHours)}</strong></span>`;
+                nextUnlockTimeEl.innerHTML = `<span title="Next unlock is '${nextUnlockItem.name}'">Next Unlock: <strong>~${formatTimeInHours(totalTimeInHours)}</strong></span>`;
             };
 
-            const updateAllUI = () => { const totalLevel = Object.values(levels).reduce((sum, level) => sum + level, 0); totalLevelEl.textContent = formatNumber(totalLevel); itemsData.forEach(item => updateItemUI(item, totalLevel)); updateTopList(totalLevel); 
-                if (id === 'grimoire' || id === 'tesseract') {
-                    updateNextUnlockTime(totalLevel);
-                }
+            const updateAllUI = () => { const totalLevel = calculateTotalLevels(levels); totalLevelEl.textContent = formatNumber(totalLevel); itemsData.forEach(item => updateItemUI(item, totalLevel)); updateTopList(totalLevel); 
+                if (id === 'grimoire' || id === 'tesseract') updateNextUnlockTime(totalLevel);
                 applyAllFilters(); 
             };
 
@@ -901,27 +991,18 @@
                 filters.hideLocked = document.getElementById(`${id}-hide-locked-check`).checked;
                 filters.hideMaxed = document.getElementById(`${id}-hide-maxed-check`).checked;
                 saveFilters();
-
-                const totalLevel = Object.values(levels).reduce((sum, level) => sum + level, 0);
-
+                const totalLevel = calculateTotalLevels(levels);
                 itemsData.forEach(item => {
                     const card = document.getElementById(item.id);
                     if (!card) return;
-
                     const currentLevel = levels[item.id] || 0;
                     const isLocked = !unlockFn(item, totalLevel, levels, playerStats);
                     const isMaxed = item.maxLevel !== null && currentLevel >= item.maxLevel;
-
                     const searchMatch = item.name.toLowerCase().includes(searchTerm);
                     const lockedHidden = filters.hideLocked && isLocked;
                     const maxedHidden = filters.hideMaxed && isMaxed;
                     const categoryMatch = categoryFilterFn(item);
-
-                    if (searchMatch && !lockedHidden && !maxedHidden && categoryMatch) {
-                        card.style.display = "";
-                    } else {
-                        card.style.display = "none";
-                    }
+                    card.style.display = (searchMatch && !lockedHidden && !maxedHidden && categoryMatch) ? "" : "none";
                 });
             };
             
@@ -932,90 +1013,99 @@
                         const field = playerStatFields[key];
                         statsHTML += `<hr/><h2>${field.title}</h2><div id="${id}-${key}-stats" class="${field.gridClass || 'production-grid'}">`;
                         for (const subKey in field.fields) {
-                        const subField = field.fields[subKey];
-
-                        // Use the new pill button style for abomination checkboxes
-                        if (subField.type === 'checkbox' && key === 'manualUnlocks') {
-                            statsHTML += `
-                                <div class="info-row">
-                                    <label for="${id}-stat-${subKey}" class="filter-label" data-label-text="${subField.label}">
-                                        <input type="checkbox" id="${id}-stat-${subKey}" data-player-stat="${subKey}" ${playerStats[subKey] ? 'checked' : ''}>
-                                    </label>
-                                </div>
-                            `;
-                        } else { 
-                            // Render all other fields normally
-                            statsHTML += `<div class="info-row"><label for="${id}-stat-${subKey}">${subField.label}:</label>`;
-                            if (subField.type === 'checkbox') {
-                                statsHTML += `<input type="checkbox" id="${id}-stat-${subKey}" data-player-stat="${subKey}" ${playerStats[subKey] ? 'checked' : ''}>`;
-                            } else {
-                                statsHTML += `<input type="text" id="${id}-stat-${subKey}" data-player-stat="${subKey}" value="${formatNumber(playerStats[subKey] || 0)}">`;
+                            const subField = field.fields[subKey];
+                            if (subField.type === 'checkbox' && key === 'manualUnlocks') {
+                                statsHTML += `<div class="info-row"><label for="${id}-stat-${subKey}" class="filter-label" data-label-text="${subField.label}"><input type="checkbox" id="${id}-stat-${subKey}" data-player-stat="${subKey}" ${playerStats[subKey] ? 'checked' : ''}></label></div>`;
+                            } else { 
+                                statsHTML += `<div class="info-row"><label for="${id}-stat-${subKey}">${subField.label}:</label>`;
+                                statsHTML += subField.type === 'checkbox' ? `<input type="checkbox" id="${id}-stat-${subKey}" data-player-stat="${subKey}" ${playerStats[subKey] ? 'checked' : ''}>` : `<input type="text" id="${id}-stat-${subKey}" data-player-stat="${subKey}" value="${formatNumber(playerStats[subKey] || 0)}">`;
+                                statsHTML += `</div>`;
                             }
-                            statsHTML += `</div>`;
                         }
-                    }
                         statsHTML += `</div>`;
                     }
                     playerStatsWrapperEl.innerHTML = statsHTML;
                 }
             };
+            
+            const initAfkMode = () => {
+                afkInputsEl.innerHTML = Object.keys(coins).map(key => `<div class="info-row"><label class="coin-label"><img src="${coins[key].img}" title="${coins[key].name}" class="coin-icon-img"> ${coins[key].name}:</label><input type="text" data-afk-coin="${key}" value="${formatNumber(afkBudgets[key] || 0)}"></div>`).join('');
+                afkInputsEl.addEventListener('input', e => {
+                    const input = e.target;
+                    if(input.dataset.afkCoin) {
+                        const coinKey = input.dataset.afkCoin;
+                        const value = parseFormattedNumber(input.value);
+                        afkBudgets[coinKey] = value;
+                        saveAfkBudgets();
+                        const originalLength = input.value.length;
+                        const selectionStart = input.selectionStart;
+                        input.value = formatNumber(value);
+                        const newLength = input.value.length;
+                        if (document.activeElement === input) input.selectionStart = input.selectionEnd = selectionStart + (newLength - originalLength);
+                    }
+                });
+                document.getElementById(`${id}-afk-calculate-btn`).addEventListener('click', () => {
+                    lastAfkResult = calculateAfkUpgrades();
+                    let totalLevelsGained = 0;
+                    const totalCosts = {};
+                    Object.keys(coins).forEach(k => totalCosts[k] = 0);
+                    afkResultsListEl.innerHTML = lastAfkResult.map(res => {
+                        const {item, levelsBought, totalCost} = res;
+                        const coin = coins[item.coin];
+                        totalLevelsGained += levelsBought;
+                        totalCosts[item.coin] += totalCost;
+                        const startLevel = levels[item.id] || 0;
+                        const endLevel = startLevel + levelsBought;
+                        return `<li><span class="afk-item-name">${item.name}</span><div class="afk-item-details"><span class="afk-level-change">Lvl ${formatNumber(startLevel)} → ${formatNumber(endLevel)} <strong>(+${formatNumber(levelsBought)})</strong></span><span>${formatNumber(totalCost)} <img src="${coin.img}" class="coin-icon-img" style="width:24px;height:24px;object-position:0 -4px;"></span></div></li>`;
+                    }).join('');
+                    let summaryHTML = `Total Levels Gained: <span>${totalLevelsGained}</span><br>Total Cost: `;
+                    summaryHTML += Object.keys(totalCosts).filter(c => totalCosts[c] > 0).map(c => `${formatNumber(totalCosts[c])} <img src="${coins[c].img}" class="coin-icon-img" style="width:18px;height:18px;object-position:0 -3px;margin-left:2px;">`).join(' + ');
+                    afkResultsSummaryEl.innerHTML = summaryHTML;
+                    afkResultsCardEl.style.display = lastAfkResult.length > 0 ? 'block' : 'none';
+                });
+                document.getElementById(`${id}-afk-apply-btn`).addEventListener('click', () => {
+                    if (lastAfkResult.length > 0) {
+                        lastAfkResult.forEach(res => { levels[res.item.id] = (levels[res.item.id] || 0) + res.levelsBought; });
+                        saveLevels();
+                        alert(`${lastAfkResult.reduce((sum, r) => sum + r.levelsBought, 0)} levels applied successfully!`);
+                        setMode('active');
+                        lastAfkResult = [];
+                        afkResultsCardEl.style.display = 'none';
+                    }
+                });
+            };
 
             const init = () => {
-                loadLevels(); loadProductionRates(); if(playerStatFields) loadPlayerStats(); loadFilters();
+                storageKeys.afkBudgets = `${id}_afk_budgets`;
+                loadLevels(); loadProductionRates(); if(playerStatFields) loadPlayerStats(); loadFilters(); loadAfkBudgets();
                 document.getElementById(`${id}-prod-title`).textContent = productionTitle || `${id.charAt(0).toUpperCase() + id.slice(1)} Collection (/hr)`;
                 productionEl.innerHTML = Object.keys(coins).map(key => `<div class="info-row"><label class="coin-label"><img src="${coins[key].img}" title="${coins[key].name}" class="coin-icon-img"> ${coins[key].name}:</label><input type="text" data-prod-coin="${key}" value="${formatNumber(productionRates[key])}"></div>`).join('');
                 renderPlayerStats();
+                initAfkMode();
 
                 if (id === 'compass') {
-                    const controlsWrapper = tabEl.querySelector('.controls-wrapper');
+                    const filterControlsContainer = tabEl.querySelector(`#${id}-filter-controls`);
                     const categoryFilterContainer = document.createElement('div');
                     categoryFilterContainer.id = 'compass-category-filters';
                     categoryFilterContainer.className = 'filter-controls';
-                    Object.assign(categoryFilterContainer.style, {
-                        flexWrap: 'wrap',
-                        justifyContent: 'flex-start',
-                        marginTop: '1rem',
-                        gap: '0.5rem 1rem',
-                        width: '100%'
-                    });
-
                     let filtersHTML = '';
                     for (const key in COMPASS_UPGRADE_CATEGORIES) {
-                        const labelText = COMPASS_UPGRADE_CATEGORIES[key].name;
-                        filtersHTML += `
-                            <label for="compass-cat-${key}" class="filter-label" data-label-text="${labelText}">
-                                <input type="checkbox" id="compass-cat-${key}" data-category-key="${key}">
-                            </label>
-                        `;
+                        filtersHTML += `<label for="compass-cat-${key}" class="filter-label" data-label-text="${COMPASS_UPGRADE_CATEGORIES[key].name}"><input type="checkbox" id="compass-cat-${key}" data-category-key="${key}"></label>`;
                     }
                     categoryFilterContainer.innerHTML = filtersHTML;
-                    controlsWrapper.appendChild(categoryFilterContainer);
-
+                    filterControlsContainer.parentNode.insertBefore(categoryFilterContainer, filterControlsContainer.nextSibling);
                     categoryFilterContainer.addEventListener('change', (e) => {
                         if (e.target.matches('input[type="checkbox"]')) {
-                            const activeCategories = [];
-                            const checkboxes = categoryFilterContainer.querySelectorAll('input:checked');
-                            checkboxes.forEach(cb => activeCategories.push(cb.dataset.categoryKey));
-
-                            if (activeCategories.length === 0) {
-                                categoryFilterFn = (item) => true;
-                            } else {
-                                categoryFilterFn = (item) => {
-                                    return activeCategories.some(catKey => 
-                                        COMPASS_UPGRADE_CATEGORIES[catKey].upgradeIndices.includes(item.index)
-                                    );
-                                };
-                            }
+                            const activeCategories = Array.from(categoryFilterContainer.querySelectorAll('input:checked')).map(cb => cb.dataset.categoryKey);
+                            categoryFilterFn = activeCategories.length === 0 ? (item) => true : (item) => activeCategories.some(catKey => COMPASS_UPGRADE_CATEGORIES[catKey].upgradeIndices.includes(item.index));
                             updateAllUI();
                         }
                     });
                 }
                 
                 itemListEl.innerHTML = itemsData.map(item => { const coin = coins[item.coin]; return `<div class="item-card card" id="${item.id}"><h3 title="${item.name}">${item.name}</h3><div class="info-row"><span>Next Cost: <span data-unlock-id="${item.id}" class="unlock-text"></span></span><span><strong data-cost-id="${item.id}">0</strong><img src="${coin.img}" title="${coin.name}" class="coin-icon-img"></span></div><div class="info-row"><span>Level:</span><div class="level-control"><button class="level-btn down" data-level-down-btn-id="${item.id}" data-change="-1">-</button><input type="text" data-level-input-id="${item.id}"><button class="level-btn" data-level-up-btn-id="${item.id}" data-change="1">+</button></div></div></div>`; }).join('');
-                
                 document.getElementById(`${id}-hide-locked-check`).checked = filters.hideLocked;
                 document.getElementById(`${id}-hide-maxed-check`).checked = filters.hideMaxed;
-
                 searchInputEl.addEventListener('input', applyAllFilters);
                 document.getElementById(`${id}-hide-locked-check`).addEventListener('change', applyAllFilters);
                 document.getElementById(`${id}-hide-maxed-check`).addEventListener('change', applyAllFilters);
@@ -1032,31 +1122,22 @@
                 updateAllUI();
             };
 
-            calculators[id] = {
-                id, itemsData, storageKeys, playerStatFields,
-                getLevels: () => levels, setLevels: (newLevels) => { levels = newLevels; },
-                getPlayerStats: () => playerStats, setPlayerStats: (newStats) => { playerStats = newStats; },
-                saveLevels, savePlayerStats, renderPlayerStats, updateAllUI
-            };
+            calculators[id] = { id, itemsData, storageKeys, playerStatFields, getLevels: () => levels, setLevels: (newLevels) => { levels = newLevels; }, getPlayerStats: () => playerStats, setPlayerStats: (newStats) => { playerStats = newStats; }, saveLevels, savePlayerStats, renderPlayerStats, updateAllUI };
             init();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             initializeCalculator({
-                id: 'grimoire',
-                productionTitle: 'Bones collection (/hr)',
-                itemsData: transformedGrimoireData,
-                coins: BONE_COINS,
+                id: 'grimoire', productionTitle: 'Bones collection (/hr)', itemsData: transformedGrimoireData, coins: BONE_COINS, 
                 storageKeys: { levels: 'grimoire_levels', production: 'grimoire_production', filters: 'grimoire_filters' },
-                costFn: (item, level) => { const { tier, base, expo } = item; if (level < 0) return 0; const tierMultiplier = 3 * Math.pow(1.05, tier); const levelMultiplier = level + (base + level) * Math.pow(expo + 0.01, level); return tierMultiplier * levelMultiplier; },
+                costFn: (item, level) => { const { tier, base, expo } = item; if (level < 0) return 0; const tierMultiplier = 3 * Math.pow(1.05, tier); return tierMultiplier * (level + (base + level) * Math.pow(expo + 0.01, level)); },
                 unlockFn: (item, totalLevel) => totalLevel >= item.toUnlock
             });
             
             const TACHYON_MAP = ["purple", "brown", "green", "red", "silver", "gold"];
             const TESSERACT_ITEMS_DATA = TESSERACT_ITEMS_RAW_DATA.map((raw, index) => ({
-                id: `t-item${index+1}`, index: index, name: raw.name.replace(/_/g, ' ').replace(/製/g, '').replace('(Tap for more info)','').trim(),
-                base: raw.x1, expo: raw.x2, coin: TACHYON_MAP[raw.x3],
-                maxLevel: raw.x4 === 999999 ? null : raw.x4, toUnlock: raw.x6,
+                id: `t-item${index+1}`, index: index, name: raw.name.replace(/_/g, ' ').replace(/製/g, '').replace('(Tap for more info)','').trim(), base: raw.x1, expo: raw.x2, coin: TACHYON_MAP[raw.x3],
+                maxLevel: raw.x4 === 999999 ? null : raw.x4, toUnlock: raw.x6
             }));
             initializeCalculator({
                 id: 'tesseract', productionTitle: 'Tachyons collection (/hr)', itemsData: TESSERACT_ITEMS_DATA, coins: TACHYON_COINS, 
@@ -1065,8 +1146,7 @@
                 costFn: (item, currentLevel, playerStats, allLevels) => {
                     const lavaLog = (num) => Math.log(Math.max(num, 1)) / 2.30258509299;
                     const massivonLevel = allLevels['t-item54'] || 0; const silverTachyons = playerStats?.silverTachyons || 0;
-                    const massivonBonus = massivonLevel * lavaLog(silverTachyons);
-                    const costReductionDivisor = 1 + (massivonBonus / 100);
+                    const costReductionDivisor = 1 + (massivonLevel * lavaLog(silverTachyons) / 100);
                     if (currentLevel < 0) return 0; const { base, expo, index } = item;
                     const baseCost = 3 * Math.pow(1.04, index) * (currentLevel + (base + currentLevel) * Math.pow(expo + 0.01, currentLevel));
                     return baseCost / costReductionDivisor;
@@ -1075,222 +1155,73 @@
             });
 
             const serverVars = { DustCost: 6.2 };
-            const randomList = {
-                105: "3 2 4 5 106 8 12 6 7 107 118 10 110 116 9 113 11 114 109 108 117 115 112 111".split(' '),
-                106: "14 17 119 18 120 16 15 21 122 124 19 123 20 121 22 129 125 130 134 128 127 133 24 25 132 131 23 135 26 136 126".split(' '),
-                107: "28 29 139 35 137 30 142 34 140 141 32 145 31 37 138 38 146 33 144 36 148 147 150 149 39 143".split(' '),
-                108: "42 41 43 44 45 154 151 47 152 49 48 155 46 52 50 157 53 158 153 56 51 156 164 55 163 57 162 159 167 54 161 58 166 160 165 168 169 59".split(' '),
-                109: "60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105".split(' ')
-            };
-
-            const elemental = randomList[105].map(Number);
-            const fighter = randomList[106].map(Number);
-            const survival = randomList[107].map(Number);
-            const nomadic = randomList[108].map(Number);
+            const randomList = { 105: "3 2 4 5 106 8 12 6 7 107 118 10 110 116 9 113 11 114 109 108 117 115 112 111".split(' '), 106: "14 17 119 18 120 16 15 21 122 124 19 123 20 121 22 129 125 130 134 128 127 133 24 25 132 131 23 135 26 136 126".split(' '), 107: "28 29 139 35 137 30 142 34 140 141 32 145 31 37 138 38 146 33 144 36 148 147 150 149 39 143".split(' '), 108: "42 41 43 44 45 154 151 47 152 49 48 155 46 52 50 157 53 158 153 56 51 156 164 55 163 57 162 159 167 54 161 58 166 160 165 168 169 59".split(' '), 109: "60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105".split(' ') };
             const abomination = randomList[109].map(Number);
 
             const COMPASS_ITEMS_DATA = COMPASS_ITEMS_RAW_DATA.map((raw, index) => {
-                const itemIndex1Based = index + 1;
-                const name = raw.name.replace(/_/g, ' ').replace('@', '<br>');
-                const pathName = ["Elemental", "Fighter", "Survival", "Nomadic", "Abominations"][raw.x10];
-                const abomArrayIndex = abomination.indexOf(index);
-                const abomName = abomArrayIndex !== -1 && abomArrayIndex < ABOMINATIONS_DATA.length
-                    ? ABOMINATIONS_DATA[abomArrayIndex].name.replace(/_/g, ' ')
-                    : null;
-                
+                const itemIndex1Based = index + 1; const name = raw.name.replace(/_/g, ' ').replace('@', '<br>'); const pathName = ["Elemental", "Fighter", "Survival", "Nomadic", "Abominations"][raw.x10]; const abomArrayIndex = abomination.indexOf(index);
+                const abomName = abomArrayIndex !== -1 && abomArrayIndex < ABOMINATIONS_DATA.length ? ABOMINATIONS_DATA[abomArrayIndex].name.replace(/_/g, ' ') : null;
                 let pathUnlockLevel = null;
-                let pathArray;
-                switch(pathName) {
-                    case "Elemental": pathArray = elemental; break;
-                    case "Fighter":   pathArray = fighter;   break;
-                    case "Survival":  pathArray = survival;  break;
-                    case "Nomadic":   pathArray = nomadic;   break;
-                }
-
-                if (pathArray) {
-                    const positionInPath = pathArray.indexOf(index);
-                    if (positionInPath !== -1) {
-                        pathUnlockLevel = positionInPath + 1;
-                    }
-                }
-                
-                return {
-                    id: `c-item${itemIndex1Based}`,
-                    index: index, name: name,
-                    base: raw.x1, expo: raw.x2, x5: raw.x5,
-                    isCircle: raw.x9 === 1,
-                    coin: ["stardust", "moondust", "sundust", "cooldust", "novadust"][raw.x3],
-                    maxLevel: raw.x4 === 999999 ? null : raw.x4,
-                    pathName: pathName,
-                    pathIndex: ["Elemental", "Fighter", "Survival", "Nomadic", "Abominations"].indexOf(pathName),
-                    pathUnlockLevel: pathUnlockLevel,
-                    abomIndex: abomArrayIndex,
-                    abomName: abomName
-                };
+                const pathArray = pathName === "Elemental" ? randomList[105].map(Number) : pathName === "Fighter" ? randomList[106].map(Number) : pathName === "Survival" ? randomList[107].map(Number) : pathName === "Nomadic" ? randomList[108].map(Number) : null;
+                if (pathArray) { const pos = pathArray.indexOf(index); if (pos !== -1) pathUnlockLevel = pos + 1; }
+                return { id: `c-item${itemIndex1Based}`, index, name, base: raw.x1, expo: raw.x2, x5: raw.x5, isCircle: raw.x9 === 1, coin: ["stardust", "moondust", "sundust", "cooldust", "novadust"][raw.x3],
+                    maxLevel: raw.x4 === 999999 ? null : raw.x4, pathName, pathIndex: ["Elemental", "Fighter", "Survival", "Nomadic", "Abominations"].indexOf(pathName), pathUnlockLevel, abomIndex: abomArrayIndex, abomName };
             });
 
             const abominationFields = {};
-            ABOMINATIONS_DATA.slice(0, abomination.length).forEach((abom, index) => {
-                abominationFields[`abom_${index}`] = { label: abom.name.replace(/_/g, ' '), type: 'checkbox', default: false };
-            });
+            ABOMINATIONS_DATA.slice(0, abomination.length).forEach((abom, index) => { abominationFields[`abom_${index}`] = { label: abom.name.replace(/_/g, ' '), type: 'checkbox', default: false }; });
             
             const getLocalCompassBonus = (allLevels, allItems, targetIndex) => {
-                const targetItem = allItems.find(i => i.index === targetIndex);
-                if (!targetItem) return 0;
-                
-                const level = allLevels[targetItem.id] || 0;
-                let baseBonus = level * targetItem.x5;
-
-                if (targetIndex === 45) {
-                    baseBonus *= Math.pow(2, Math.floor(level / 50));
-                }
-
-                if (targetItem.isCircle) {
-                    const circleSupremacyBonus = getLocalCompassBonus(allLevels, allItems, 39);
-                    const abom21Bonus = getLocalCompassBonus(allLevels, allItems, 80);
-                    const multiplier = 1 + (circleSupremacyBonus + abom21Bonus) / 100;
-                    return baseBonus * multiplier;
-                }
+                const targetItem = allItems.find(i => i.index === targetIndex); if (!targetItem) return 0; const level = allLevels[targetItem.id] || 0; let baseBonus = level * targetItem.x5;
+                if (targetIndex === 45) baseBonus *= Math.pow(2, Math.floor(level / 50));
+                if (targetItem.isCircle) baseBonus *= (1 + (getLocalCompassBonus(allLevels, allItems, 39) + getLocalCompassBonus(allLevels, allItems, 80)) / 100);
                 return baseBonus;
             };
 
             initializeCalculator({
-                id: 'compass',
-                productionTitle: 'Dust collection (/hr)',
-                itemsData: COMPASS_ITEMS_DATA,
-                coins: COMPASS_COINS,
+                id: 'compass', productionTitle: 'Dust collection (/hr)', itemsData: COMPASS_ITEMS_DATA, coins: COMPASS_COINS,
                 storageKeys: { levels: 'compass_levels', production: 'compass_production', playerStats: 'compass_playerStats', filters: 'compass_filters' },
-                playerStatFields: {
-                    manualUnlocks: {
-                        title: 'Slain Abominations',
-                        fields: abominationFields,
-                        gridClass: 'manual-unlock-grid'
-                    }
-                },
+                playerStatFields: { manualUnlocks: { title: 'Slain Abominations', fields: abominationFields, gridClass: 'manual-unlock-grid' } },
                 costFn: (item, level, playerStats, allLevels) => {
                     const getBonus = (index) => getLocalCompassBonus(allLevels, COMPASS_ITEMS_DATA, index);
-                    
                     let redCostDivisor = 1; let surplusCost = 0;
-                    
-                    switch (item.index) {
-                        case 45: redCostDivisor = 1 + (getBonus(151) + getBonus(152) + getBonus(154)) / 100; break;
-                        case 43: redCostDivisor = 1 + (getBonus(153) + getBonus(156)) / 100; break;
-                        case 48: redCostDivisor = 1 + (getBonus(155) + getBonus(157) + getBonus(158)) / 100; break;
-                        case 57: redCostDivisor = 1 + (getBonus(159) + getBonus(160) + getBonus(161) + getBonus(168)) / 100; break;
-                        case 51: redCostDivisor = 1 + (getBonus(162) + getBonus(163) + getBonus(164) + getBonus(166) + getBonus(167)) / 100; break;
-                        case 54: redCostDivisor = 1 + (getBonus(165) + getBonus(169)) / 100; break;
-                    }
-
-                    if (item.name.endsWith(" Path")) {
-                        surplusCost = (Math.pow(3 * level, 2) + 12 * level) * Math.pow(1.1, level);
-                    }
-                    
+                    switch (item.index) { case 45: redCostDivisor = 1 + (getBonus(151) + getBonus(152) + getBonus(154)) / 100; break; case 43: redCostDivisor = 1 + (getBonus(153) + getBonus(156)) / 100; break; case 48: redCostDivisor = 1 + (getBonus(155) + getBonus(157) + getBonus(158)) / 100; break; case 57: redCostDivisor = 1 + (getBonus(159) + getBonus(160) + getBonus(161) + getBonus(168)) / 100; break; case 51: redCostDivisor = 1 + (getBonus(162) + getBonus(163) + getBonus(164) + getBonus(166) + getBonus(167)) / 100; break; case 54: redCostDivisor = 1 + (getBonus(165) + getBonus(169)) / 100; break; }
+                    if (item.name.endsWith(" Path")) surplusCost = (Math.pow(3 * level, 2) + 12 * level) * Math.pow(1.1, level);
                     const dustCost = Math.max(serverVars.DustCost, 1);
                     const bonusReductionDivisor = 1 + (getBonus(36) + getBonus(77)) / 100;
-                    
-                    const randoListKey = 105 + item.pathIndex;
-                    const randoListForPath = randomList[randoListKey];
-                    let randoMultiplier = 1;
-
-                    if (randoListForPath) {
-                        const positionInList = randoListForPath.indexOf(String(item.index));
-                        if (positionInList !== -1) {
-                            randoMultiplier = Math.max(1, Math.pow(3.2 - randoListForPath.length / 60, positionInList));
-                        }
-                    }
-
+                    const randoListKey = 105 + item.pathIndex; const randoListForPath = randomList[randoListKey]; let randoMultiplier = 1;
+                    if (randoListForPath) { const pos = randoListForPath.indexOf(String(item.index)); if (pos !== -1) randoMultiplier = Math.max(1, Math.pow(3.2 - randoListForPath.length / 60, pos)); }
                     const finalCost = surplusCost + dustCost * (1 / bonusReductionDivisor) * (1 / Math.max(1, redCostDivisor)) * (item.base / 2) * randoMultiplier * Math.pow(item.expo, level);
                     return Math.max(1, Math.floor(finalCost));
                 },
                 unlockFn: (item, totalLevel, allLevels, playerStats) => {
-                    if (item.name === 'Pathfinder' || item.name === 'Worldfinder' || item.name === 'Stop Drop and Roll' || item.name === "Grumblo's Guarantee" || item.name.endsWith(" Path")) {
-                        return true;
-                    }
-
-                    if (item.pathName === "Abominations") {
-                        return item.abomIndex !== -1 && (playerStats[`abom_${item.abomIndex}`] || false);
-                    }
-                    
+                    if (item.name === 'Pathfinder' || item.name === 'Worldfinder' || item.name === 'Stop Drop and Roll' || item.name === "Grumblo's Guarantee" || item.name.endsWith(" Path")) return true;
+                    if (item.pathName === "Abominations") return item.abomIndex !== -1 && (playerStats[`abom_${item.abomIndex}`] || false);
                     if (item.pathUnlockLevel === null) return false;
-
                     let controlItemId;
-                    switch(item.pathName) {
-                        case "Elemental": controlItemId = 'c-item2'; break;
-                        case "Fighter":   controlItemId = 'c-item14'; break;
-                        case "Survival":  controlItemId = 'c-item28'; break;
-                        case "Nomadic":   controlItemId = 'c-item41'; break;
-                        default: return false;
-                    }
-
-                    const pathLevel = allLevels[controlItemId] || 0;
-                    return pathLevel >= item.pathUnlockLevel;
+                    switch(item.pathName) { case "Elemental": controlItemId = 'c-item2'; break; case "Fighter": controlItemId = 'c-item14'; break; case "Survival": controlItemId = 'c-item28'; break; case "Nomadic": controlItemId = 'c-item41'; break; default: return false; }
+                    return (allLevels[controlItemId] || 0) >= item.pathUnlockLevel;
                 }
             });
             
             document.getElementById('import-submit-btn').addEventListener('click', () => {
                 const jsonText = document.getElementById('import-textarea').value;
-                if (!jsonText) { return alert('Textarea is empty.'); }
+                if (!jsonText) return alert('Textarea is empty.');
                 try {
                     const importedData = JSON.parse(jsonText);
-
-                    if (importedData.Grimoire && calculators.grimoire) {
-                        const newLevels = {};
-                        calculators.grimoire.itemsData.forEach((item, index) => {
-                            newLevels[item.id] = importedData.Grimoire[index] || 0;
-                        });
-                        calculators.grimoire.setLevels(newLevels);
-                        calculators.grimoire.saveLevels();
-                        calculators.grimoire.updateAllUI();
-                    }
-
-                    if (importedData.Arcane && calculators.tesseract) {
-                        const newLevels = {};
-                        calculators.tesseract.itemsData.forEach((item, index) => {
-                            newLevels[item.id] = importedData.Arcane[index] || 0;
-                        });
-                        calculators.tesseract.setLevels(newLevels);
-                        calculators.tesseract.saveLevels();
-                        calculators.tesseract.updateAllUI();
-                    }
-
+                    if (importedData.Grimoire && calculators.grimoire) { const newLevels = {}; calculators.grimoire.itemsData.forEach((item, index) => { newLevels[item.id] = importedData.Grimoire[index] || 0; }); calculators.grimoire.setLevels(newLevels); calculators.grimoire.saveLevels(); calculators.grimoire.updateAllUI(); }
+                    if (importedData.Arcane && calculators.tesseract) { const newLevels = {}; calculators.tesseract.itemsData.forEach((item, index) => { newLevels[item.id] = importedData.Arcane[index] || 0; }); calculators.tesseract.setLevels(newLevels); calculators.tesseract.saveLevels(); calculators.tesseract.updateAllUI(); }
                     if (importedData.Compass && calculators.compass) {
-                        let compassData;
-                        if (typeof importedData.Compass === 'string') {
-                            try {
-                                compassData = JSON.parse(importedData.Compass);
-                            } catch (e) {
-                                console.error("Could not parse the 'Compass' data string:", e);
-                                alert("The Compass data in the JSON is malformed.");
-                                return;
-                            }
-                        } else {
-                            compassData = importedData.Compass;
-                        }
-                        
-                        const compassLevels = compassData[0] || [];
-                        const abominationStatus = compassData[1] || [];
-                        
-                        const newLevels = {};
-                        calculators.compass.itemsData.forEach((item, index) => {
-                            newLevels[item.id] = compassLevels[index] || 0;
-                        });
-                        calculators.compass.setLevels(newLevels);
-                        calculators.compass.saveLevels();
-
+                        let compassData = typeof importedData.Compass === 'string' ? JSON.parse(importedData.Compass) : importedData.Compass;
+                        const compassLevels = compassData[0] || []; const abominationStatus = compassData[1] || []; const newLevels = {};
+                        calculators.compass.itemsData.forEach((item, index) => { newLevels[item.id] = compassLevels[index] || 0; });
+                        calculators.compass.setLevels(newLevels); calculators.compass.saveLevels();
                         const newStats = calculators.compass.getPlayerStats();
-                        abominationStatus.forEach((status, index) => {
-                            const key = `abom_${index}`;
-                            newStats[key] = (status === 1);
-                        });
-                        calculators.compass.setPlayerStats(newStats);
-                        calculators.compass.savePlayerStats();
-                        
-                        calculators.compass.renderPlayerStats();
-                        calculators.compass.updateAllUI();
+                        abominationStatus.forEach((status, index) => { newStats[`abom_${index}`] = (status === 1); });
+                        calculators.compass.setPlayerStats(newStats); calculators.compass.savePlayerStats();
+                        calculators.compass.renderPlayerStats(); calculators.compass.updateAllUI();
                     }
-                    
                     alert('Data imported successfully!');
-
                 } catch (e) {
                     alert('Invalid JSON data. Please check the format and try again.\n\nError: ' + e.message);
                 }
